@@ -1,10 +1,7 @@
-package deniscbrex.dev.todolist;
+package deniscbrex.dev.asdfsafa;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-/**
- * @author Denis Cuenca Brex
- */
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,9 +9,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
-
-    public void CreateNewNote(Note newNote){
-
     }
 }
