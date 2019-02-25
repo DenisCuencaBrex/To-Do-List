@@ -19,4 +19,7 @@
     <string name="rb_fast">Fast</string>
     <string name="rb_slow">Slow</string>
     <string name="rb_none">None</string>
+
+    <string name="show_note">"Your note: "</string>
+    <string name="add_note">Add new note</string>
 </resources>

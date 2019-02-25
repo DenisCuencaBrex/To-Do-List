@@ -33,7 +33,7 @@ public class DialogNewNote extends DialogFragment {
         Button btnOk = (Button) dialogView.findViewById(R.id.btnOk);
 
         builder.setView(dialogView)
-                .setMessage("Añadir una nueva nota");
+                .setMessage(R.string.add_note);
 
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override

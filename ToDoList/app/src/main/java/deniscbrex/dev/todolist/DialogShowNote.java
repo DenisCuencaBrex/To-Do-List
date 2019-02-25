@@ -14,7 +14,8 @@ public class DialogShowNote extends DialogFragment {
 
     private Note mNote;
 
-    public void sentNotSelected(Note noteSelected){
+    public void sendNotSelected(Note noteSelected){
+
         this.mNote = noteSelected;
     }
 
@@ -51,7 +52,7 @@ public class DialogShowNote extends DialogFragment {
         Button btnOk = (Button) dialogView.findViewById(R.id.btnOk);
 
         builder.setView(dialogView)
-                .setMessage("Tu nota: ");
+                .setMessage(R.string.show_note);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

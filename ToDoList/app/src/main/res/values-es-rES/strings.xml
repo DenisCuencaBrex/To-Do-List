@@ -17,4 +17,6 @@
     <string name="rb_slow">Lenta</string>
     <string name="rb_none">Ninguna</string>
     <string name="todo_checkbox">Tarea</string>
+    <string name="show_note">"Tu nota: "</string>
+    <string name="add_note">Añadir una nueva nota</string>
 </resources>
