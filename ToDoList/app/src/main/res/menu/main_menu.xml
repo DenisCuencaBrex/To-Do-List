@@ -2,9 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
- <item android:id="@+id/action_add"
+ <item
+     android:id="@+id/action_add"
      android:icon="@drawable/baseline_add_black_24"
      android:title="@string/action_add"
-     app:showAsAction = "ifRoom"></item>
+     app:showAsAction="ifRoom"></item>
 
 </menu>

@@ -1,11 +1,21 @@
 package deniscbrex.dev.todolist;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Denis Cuenca Brex
@@ -13,29 +23,35 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Note nTempNote = new Note();
+    private NoteAdapter mNoteAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
+        mNoteAdapter = new NoteAdapter();
+
+        ListView listNote = (ListView) findViewById(R.id.list_view);
+
+        listNote.setAdapter(mNoteAdapter);
+
+        listNote.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                //Crea una instancia de Dialog Show Note
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Charge the note who we click
+                Note tempNote = mNoteAdapter.getItem(position);
+                //Create a instance of show note
                 DialogShowNote dialog = new DialogShowNote();
-                //Indica al dialogo que nota tiene que mostrar
-                dialog.sendNotSelected(nTempNote);
-                //Muestra el dialogo por pantalla
-                dialog.show(getSupportFragmentManager(), "note_create");
+                dialog.sendNotSelected(tempNote);
+                dialog.show(getSupportFragmentManager(), "asf");
+
             }
         });
     }
 
     public void CreateNewNote(Note newNote){
-        nTempNote = newNote;
+        mNoteAdapter.AddNote(newNote);
     }
 
     @Override
@@ -56,5 +72,70 @@ public class MainActivity extends AppCompatActivity {
 
 
         return false;
+    }
+
+    public class NoteAdapter extends BaseAdapter {
+
+        List<Note> noteList = new ArrayList<Note>();
+
+        @Override
+        public int getCount() {
+            return noteList.size();
+        }
+
+        @Override
+        public Note getItem(int position) {
+            return noteList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            //inflate list
+            if(convertView == null){
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = inflater.inflate(R.layout.list_item, parent, false);
+            }
+
+
+            //Charges all the widget
+            TextView textViewTitle = (TextView) convertView.findViewById(R.id.text_view_title);
+            TextView textViewDescription = (TextView) convertView.findViewById(R.id.text_view_description);
+
+            ImageView imageViewImportant = (ImageView) convertView.findViewById(R.id.image_view_important);
+            ImageView imageViewTodo = (ImageView) convertView.findViewById(R.id.image_view_todo);
+            ImageView imageViewIdea = (ImageView) convertView.findViewById(R.id.image_view_idea);
+
+
+            //change title and description of the layout
+            Note currentNote = noteList.get(position);
+
+            if(!currentNote.isImportant()){
+                imageViewImportant.setVisibility(View.GONE);
+            }
+            if(!currentNote.isTodo()){
+                imageViewTodo.setVisibility(View.GONE);
+            }
+            if(!currentNote.isIdea()){
+                imageViewIdea.setVisibility(View.GONE);
+            }
+
+
+            textViewTitle.setText(currentNote.getTitle());
+           textViewDescription.setText(currentNote.getDescription());
+
+            return convertView;
+        }
+
+        public void AddNote(Note n){
+            noteList.add(n);
+            notifyDataSetChanged();
+        }
+
     }
 }
