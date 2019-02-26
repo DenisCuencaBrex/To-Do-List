@@ -1,6 +1,8 @@
 package deniscbrex.dev.todolist;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -25,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
 
     private NoteAdapter mNoteAdapter;
 
+    private boolean mSound;
+    private int mAnimationOption;
+    private SharedPreferences mPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,15 +45,32 @@ public class MainActivity extends AppCompatActivity {
         listNote.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Charge the note who we click
+                //carga la nota que es clickeada
                 Note tempNote = mNoteAdapter.getItem(position);
-                //Create a instance of show note
+                //Crea la instancia de Show Note
                 DialogShowNote dialog = new DialogShowNote();
                 dialog.sendNotSelected(tempNote);
                 dialog.show(getSupportFragmentManager(), "asf");
 
             }
         });
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mNoteAdapter.saveNotes();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mPrefs = getSharedPreferences("To do list", MODE_PRIVATE);
+        mSound = mPrefs.getBoolean("sound", true);
+        mAnimationOption = mPrefs.getInt("anim option", SettingActivity.FAST);
     }
 
     public void CreateNewNote(Note newNote){
@@ -69,7 +92,10 @@ public class MainActivity extends AppCompatActivity {
             dialog.show(getSupportFragmentManager(), "note_show" );
         }
 
-
+        if(item.getItemId() == R.id.action_settings){
+            Intent intent = new Intent(this, SettingActivity.class);
+            startActivity(intent);
+        }
 
         return false;
     }
@@ -77,6 +103,25 @@ public class MainActivity extends AppCompatActivity {
     public class NoteAdapter extends BaseAdapter {
 
         List<Note> noteList = new ArrayList<Note>();
+        private JSONSerializer mSerializer;
+
+        public NoteAdapter(){
+            mSerializer = new JSONSerializer("ToDoList.json", MainActivity.this.getApplicationContext());
+
+            try{
+                noteList = mSerializer.load();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        public void saveNotes(){
+            try{
+                mSerializer.save(noteList);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
         @Override
         public int getCount() {
@@ -96,14 +141,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            //inflate list
+            //infla la lista
             if(convertView == null){
                 LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.list_item, parent, false);
             }
 
 
-            //Charges all the widget
+            //Carga todos los widgets
             TextView textViewTitle = (TextView) convertView.findViewById(R.id.text_view_title);
             TextView textViewDescription = (TextView) convertView.findViewById(R.id.text_view_description);
 
@@ -112,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
             ImageView imageViewIdea = (ImageView) convertView.findViewById(R.id.image_view_idea);
 
 
-            //change title and description of the layout
+            //cambia el titulo y la descripcion en el layout
             Note currentNote = noteList.get(position);
 
             if(!currentNote.isImportant()){

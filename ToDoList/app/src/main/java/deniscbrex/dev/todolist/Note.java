@@ -1,5 +1,8 @@
 package deniscbrex.dev.todolist;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * @author Denis Cuenca Brex
  */
@@ -12,17 +15,50 @@ public class Note {
     private boolean m_Todo;
     private boolean m_Important;
 
-    //Getter of String m_title
+    private static final String JSON_TITLE = "title";
+    private static final String JSON_DESCRIPTION = "description";
+    private static final String JSON_IDEA = "idea";
+    private static final String JSON_TODO = "todo";
+    private static final String JSON_IMPORTANT = "important";
+
+
+    //constructor base vacio
+    public Note(){
+
+    }
+    //constructor para crear una nota de un fichero JSON
+    public Note(JSONObject jo) throws JSONException{
+        m_Title = jo.getString(JSON_TITLE);
+        m_Description = jo.getString(JSON_DESCRIPTION);
+        m_Idea = jo.getBoolean(JSON_IDEA);
+        m_Todo = jo.getBoolean(JSON_TODO);
+        m_Important = jo.getBoolean(JSON_IMPORTANT);
+    }
+
+    //constructor para serializar el fichero JSON
+    public JSONObject convertNoteToJSON() throws JSONException{
+        JSONObject jo = new JSONObject();
+
+        jo.put(JSON_TITLE, m_Title);
+        jo.put(JSON_DESCRIPTION, m_Description);
+        jo.put(JSON_IDEA, m_Idea);
+        jo.put(JSON_TODO, m_Todo);
+        jo.put(JSON_IMPORTANT, m_Important);
+
+        return jo;
+    }
+
+
     public String getTitle() {
         return m_Title;
     }
-    //Setter of String m_title
+
     public void setTitle(String m_Title) {
         this.m_Title = m_Title;
     }
 
 
-    //Getter and Setter of String m_Description
+
     public String getDescription() {
         return m_Description;
     }
@@ -33,7 +69,6 @@ public class Note {
 
 
 
-    //Getter and Setter of bollean m_Idea
     public boolean isIdea() {
         return m_Idea;
     }
@@ -44,7 +79,6 @@ public class Note {
 
 
 
-    //Getter and Setter of m_Todo
     public boolean isTodo() {
         return m_Todo;
     }
@@ -55,7 +89,6 @@ public class Note {
 
 
 
-    //Getter and Setter of m_Important
     public boolean isImportant() {
         return m_Important;
     }
