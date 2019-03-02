@@ -19,4 +19,7 @@
     <string name="todo_checkbox">Tarea</string>
     <string name="show_note">"Tu nota: "</string>
     <string name="add_note">Añadir una nueva nota</string>
+    <string name="delete_note">Borrar nota</string>
+    <string name="cancel_note">Cancelar</string>
+    <string name="ok_note">Borrar</string>
 </resources>

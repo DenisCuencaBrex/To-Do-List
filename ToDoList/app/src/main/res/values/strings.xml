@@ -22,4 +22,8 @@
 
     <string name="show_note">"Your note: "</string>
     <string name="add_note">Add new note</string>
+
+    <string name="delete_note">Delete note</string>
+    <string name="cancel_note">Cancel</string>
+    <string name="ok_note">Delete</string>
 </resources>

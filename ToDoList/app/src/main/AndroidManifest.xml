@@ -23,6 +23,7 @@
             android:label="@string/action_settings"
             android:parentActivityName=".MainActivity"
             ></activity>
+        <activity android:name=".DialogDelete" />
     </application>
 
 </manifest>

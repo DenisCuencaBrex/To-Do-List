@@ -3,6 +3,12 @@ package deniscbrex.dev.todolist;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -10,12 +16,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +40,12 @@ public class MainActivity extends AppCompatActivity {
     private int mAnimationOption;
     private SharedPreferences mPrefs;
 
+    private Animation mAnimFlash;
+    private Animation mAnimFadeIn;
+
+    private int mIdBeep = -1;
+    private SoundPool mSp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,15 +60,51 @@ public class MainActivity extends AppCompatActivity {
         listNote.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if(mSound){
+                    mSp.play(mIdBeep, 1,1,0,0,1);
+                }
                 //carga la nota que es clickeada
                 Note tempNote = mNoteAdapter.getItem(position);
                 //Crea la instancia de Show Note
                 DialogShowNote dialog = new DialogShowNote();
                 dialog.sendNotSelected(tempNote);
-                dialog.show(getSupportFragmentManager(), "asf");
+                dialog.show(getSupportFragmentManager(), "onclick");
 
             }
         });
+
+        listNote.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                mNoteAdapter.DeleteNote(position);
+                return true;
+            }
+        });
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            AudioAttributes attr = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+
+            mSp = new SoundPool.Builder()
+                    .setMaxStreams(5)
+                    .setAudioAttributes(attr)
+                    .build();
+        }else {
+            mSp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        }
+
+        try {
+            AssetManager manager = this.getAssets();
+            AssetFileDescriptor desc = manager.openFd("beep.ogg");
+            mIdBeep = mSp.load(desc, 0);
+
+        }catch (IOException e){
+            e.printStackTrace();
+
+        }
 
     }
 
@@ -71,6 +122,19 @@ public class MainActivity extends AppCompatActivity {
         mPrefs = getSharedPreferences("To do list", MODE_PRIVATE);
         mSound = mPrefs.getBoolean("sound", true);
         mAnimationOption = mPrefs.getInt("anim option", SettingActivity.FAST);
+
+        mAnimFlash = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.flash);
+        mAnimFadeIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in);
+
+        if(mAnimationOption == SettingActivity.FAST){
+            mAnimFlash.setDuration(1000);
+        }else if(mAnimationOption == SettingActivity.SLOW){
+            mAnimFadeIn.setDuration(100);
+        }
+
+        mNoteAdapter.notifyDataSetChanged();
+
+
     }
 
     public void CreateNewNote(Note newNote){
@@ -160,6 +224,12 @@ public class MainActivity extends AppCompatActivity {
             //cambia el titulo y la descripcion en el layout
             Note currentNote = noteList.get(position);
 
+            if (currentNote.isImportant()&& mAnimationOption!=SettingActivity.NONE){
+                convertView.setAnimation(mAnimFlash);
+            } else {
+                convertView.setAnimation(mAnimFadeIn);
+            }
+
             if(!currentNote.isImportant()){
                 imageViewImportant.setVisibility(View.GONE);
             }
@@ -182,5 +252,12 @@ public class MainActivity extends AppCompatActivity {
             notifyDataSetChanged();
         }
 
+        public void DeleteNote(int n){
+            noteList.remove(n);
+            notifyDataSetChanged();
+        }
+
     }
+
+
 }
